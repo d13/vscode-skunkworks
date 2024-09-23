@@ -1,0 +1,3 @@
+class TodosWebview {
+  constructor() {}
+}

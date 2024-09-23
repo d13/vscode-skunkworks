@@ -1,0 +1,26 @@
+/* content in web component slots don't inherit box-sizing properly, just brute forcing border-box */
+/*
+html {
+    box-sizing: border-box;
+}
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
+*/
+
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+/* avoids FOUC for elements not yet called with `define()` */
+:not(:defined) {
+    visibility: hidden;
+}
+
+[hidden] {
+    display: none !important;
+}
