@@ -1,5 +1,4 @@
-import { Webview, Uri, WebviewOptions, commands, window } from "vscode";
-import { getNonce } from "../../env/crypto";
+import { getNonce } from "@env/crypto";
 
 export function registerWebviewPanel(
   command: string,

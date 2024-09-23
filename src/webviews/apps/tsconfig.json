@@ -1,0 +1,14 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react",
+    "lib": ["dom", "dom.iterable", "es2022", "esnext.disposable"],
+    "outDir": "../../",
+    "paths": {
+      "@env/*": ["src/env/browser/*"]
+    },
+    "useDefineForClassFields": false // needed for lit decorators https://github.com/lit/lit/issues/3278 https://lit.dev/docs/tools/publishing/#publishing-modern-javascript
+  },
+  "include": ["./**/*", "../../env/browser/**/*", "../hosts/**/protocol.ts"],
+  "exclude": ["../../env/node/**/*"] // TODO not sure why this path needed to be excluded
+}
