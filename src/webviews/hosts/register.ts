@@ -1,17 +1,45 @@
+import {
+  Webview,
+  Uri,
+  WebviewOptions,
+  commands,
+  window,
+  ExtensionContext,
+  Disposable,
+} from "vscode";
 import { getNonce } from "@env/crypto";
 
 export function registerWebviewPanel(
   command: string,
-  descriptor: WebviewDescriptor
-) {
+  descriptor: WebviewDescriptor,
+  context: ExtensionContext
+): Disposable {
   function createWebview() {
-    const panel = window.createWebviewPanel(descriptor.id, descriptor.title, {
-      viewColumn: window.activeTextEditor?.viewColumn ?? 1,
-      ...descriptor.webviewOptions,
-    });
+    const panel = window.createWebviewPanel(
+      descriptor.id,
+      descriptor.title,
+      {
+        viewColumn: window.activeTextEditor?.viewColumn ?? 1,
+      },
+      {
+        enableScripts: true,
+        ...descriptor.webviewOptions,
+      }
+    );
+
+    panel.webview.html = getWebviewContent(
+      panel.webview,
+      context.extensionUri,
+      {
+        webviewId: descriptor.id,
+        webviewInstanceId: undefined,
+        placement: "editor",
+        descriptor,
+      }
+    );
   }
 
-  commands.registerCommand(command, () => createWebview());
+  return commands.registerCommand(command, () => createWebview());
 }
 
 export function registerWebviewView() {}
@@ -91,14 +119,21 @@ export function getHtml<SerializedState>(
       return html;
     }
 
+    type ReplacementToken = keyof typeof tokens | "roots";
     return html.replace(
-      /#{(head|body|endOfBody|webviewId|webviewInstanceId|placement|cspSource|cspNonce|root|webviewsRoot|webviewRoot|bootstrap)}/g,
-      (_substring: string, token: keyof typeof tokens) => {
+      /#{(head|body|endOfBody|webviewId|webviewInstanceId|placement|cspSource|cspNonce|roots|root|webviewsRoot|webviewRoot|bootstrap)}/g,
+      (_substring: string, token: ReplacementToken) => {
         switch (token) {
           case "bootstrap":
             return tokens.bootstrap !== undefined
               ? JSON.stringify(tokens.bootstrap).replace(/"/g, "&quot;")
               : "";
+          case "roots":
+            return JSON.stringify({
+              root: tokens.root,
+              webviewsRoot: tokens.webviewsRoot,
+              webviewRoot: tokens.webviewRoot,
+            }).replace(/"/g, "&quot;");
           default:
             return tokens[token] ?? "";
         }
@@ -121,13 +156,13 @@ export function getHtml<SerializedState>(
                 and only allow scripts that have a specific nonce.
                 (See the 'webview-sample' extension sample for img-src content security policy examples)
             -->
-            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src \${cspSource}; script-src 'nonce-\${cspNonce}';">
+            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src #{cspSource}; script-src #{cspSource} 'nonce-#{cspNonce}';">
 
-            <link href="\${webviewsRoot}/shared/vscode.css" rel="stylesheet">
+            <link href="#{webviewsRoot}/webview.css" rel="stylesheet">
         </head>
         <body class="preload">
-            <webview-app state="\${bootstrap}"></webview-app>
-            <script nonce="\${cspNonce}" src="\${webviewRoot}/index.js"></script>
+            <webview-app roots="#{roots}" state="#{bootstrap}"></webview-app>
+            <script type="module" nonce="#{cspNonce}" src="#{webviewRoot}.js"></script>
         </body>
     </html>`);
 }
