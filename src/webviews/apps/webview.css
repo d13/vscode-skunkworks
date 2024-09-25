@@ -32,3 +32,11 @@ html {
 [hidden] {
     display: none !important;
 }
+
+.preload {
+    opacity: 0;
+}
+
+body:not(.preload) {
+    transition: opacity 0.1s ease-in;
+}

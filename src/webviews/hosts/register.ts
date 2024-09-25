@@ -159,10 +159,11 @@ export function getHtml<SerializedState>(
             <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src #{cspSource}; script-src #{cspSource} 'nonce-#{cspNonce}';">
 
             <link href="#{webviewsRoot}/webview.css" rel="stylesheet">
+
+            <script type="module" nonce="#{cspNonce}" src="#{webviewRoot}.js" defer></script>
         </head>
         <body class="preload">
-            <webview-app roots="#{roots}" state="#{bootstrap}"></webview-app>
-            <script type="module" nonce="#{cspNonce}" src="#{webviewRoot}.js"></script>
+            <webview-app roots="#{roots}" placement="#{placement}" state="#{bootstrap}"></webview-app>
         </body>
     </html>`);
 }
