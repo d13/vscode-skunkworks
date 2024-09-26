@@ -1,14 +1,14 @@
-import type { Event } from "vscode";
-import { EventEmitter } from "vscode";
+import type { Event } from 'vscode';
+import { EventEmitter } from 'vscode';
 
 export class Container {
   static #instance: Container | undefined;
   static #proxy = new Proxy<Container>({} as Container, {
-    get: function (target, prop) {
+    get: function (target, prop: keyof Container) {
       // In case anyone has cached this instance
 
       if (Container.#instance !== undefined) {
-        return (Container.#instance as any)[prop];
+        return Container.#instance[prop];
       }
 
       // Allow access to config before we are initialized
@@ -17,13 +17,13 @@ export class Container {
       //   }
 
       // debugger;
-      throw new Error("Container is not initialized");
+      throw new Error('Container is not initialized');
     },
   });
 
   static create() {
     if (Container.#instance !== undefined) {
-      throw new Error("Container already created");
+      throw new Error('Container already created');
     }
     Container.#instance = new Container();
     return Container.#instance;
@@ -38,5 +38,5 @@ export class Container {
     return this._onReady.event;
   }
 
-  constructor() {}
+  // constructor() {}
 }

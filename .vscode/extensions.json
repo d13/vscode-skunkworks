@@ -5,6 +5,7 @@
     "dbaeumer.vscode-eslint",
     "amodio.tsl-problem-matcher",
     "ms-vscode.extension-test-runner",
-    "eamodio.gitlens"
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode"
   ]
 }

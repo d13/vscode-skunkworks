@@ -1,10 +1,9 @@
 /* This @supports selector is a temporary fix for https://github.com/microsoft/vscode/issues/213045#issuecomment-2211442905 */
 @supports selector(::-webkit-scrollbar) {
-    html {
-        scrollbar-color: unset;
-    }
+  html {
+    scrollbar-color: unset;
+  }
 }
-
 
 /* content in web component slots don't inherit box-sizing properly, just brute forcing border-box */
 /*
@@ -21,22 +20,22 @@ html {
 *,
 *:before,
 *:after {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 /* avoids FOUC for elements not yet called with `define()` */
 :not(:defined) {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 [hidden] {
-    display: none !important;
+  display: none !important;
 }
 
 .preload {
-    opacity: 0;
+  opacity: 0;
 }
 
 body:not(.preload) {
-    transition: opacity 0.1s ease-in;
+  transition: opacity 0.1s ease-in;
 }

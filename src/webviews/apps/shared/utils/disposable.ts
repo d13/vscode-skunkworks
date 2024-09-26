@@ -5,7 +5,7 @@ export interface Disposable {
 export function disposableFrom(...disposables: Disposable[]): Disposable {
   return {
     dispose: () => {
-      disposables.forEach((disposable) => disposable.dispose());
+      disposables.forEach(disposable => disposable.dispose());
     },
   };
 }

@@ -1,17 +1,12 @@
-import { adoptStyles } from "lit";
-import type { CSSResultGroup, CSSResultOrNative } from "lit";
+import { adoptStyles } from 'lit';
+import type { CSSResultGroup, CSSResultOrNative } from 'lit';
 
-export function applyAdoptableStyles(
-  root: DocumentOrShadowRoot,
-  styles: CSSResultGroup
-): void {
+export function applyAdoptableStyles(root: DocumentOrShadowRoot, styles: CSSResultGroup): void {
   // Casting to ShadowRoot as a temporary fix for https://github.com/lit/lit/issues/3339
   adoptStyles(root as ShadowRoot, flattenResultGroup(styles));
 }
 
-export function flattenResultGroup(
-  cssResults: CSSResultGroup
-): CSSResultOrNative[] {
+export function flattenResultGroup(cssResults: CSSResultGroup): CSSResultOrNative[] {
   if (!Array.isArray(cssResults)) {
     return [cssResults];
   }

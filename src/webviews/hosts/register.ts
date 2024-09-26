@@ -1,18 +1,11 @@
-import {
-  Webview,
-  Uri,
-  WebviewOptions,
-  commands,
-  window,
-  ExtensionContext,
-  Disposable,
-} from "vscode";
-import { getNonce } from "@env/crypto";
+import { getNonce } from '@env/crypto';
+import type { Webview, WebviewOptions, ExtensionContext, Disposable } from 'vscode';
+import { Uri, commands, window } from 'vscode';
 
 export function registerWebviewPanel(
   command: string,
   descriptor: WebviewDescriptor,
-  context: ExtensionContext
+  context: ExtensionContext,
 ): Disposable {
   function createWebview() {
     const panel = window.createWebviewPanel(
@@ -24,19 +17,15 @@ export function registerWebviewPanel(
       {
         enableScripts: true,
         ...descriptor.webviewOptions,
-      }
+      },
     );
 
-    panel.webview.html = getWebviewContent(
-      panel.webview,
-      context.extensionUri,
-      {
-        webviewId: descriptor.id,
-        webviewInstanceId: undefined,
-        placement: "editor",
-        descriptor,
-      }
-    );
+    panel.webview.html = getWebviewContent(panel.webview, context.extensionUri, {
+      webviewId: descriptor.id,
+      webviewInstanceId: undefined,
+      placement: 'editor',
+      descriptor,
+    });
   }
 
   return commands.registerCommand(command, () => createWebview());
@@ -61,14 +50,13 @@ export interface IncludeTokens<SerializedState> {
 export interface RenderConfig<SerializedState> {
   webviewId: string;
   webviewInstanceId: string | undefined;
-  placement: "editor" | "view";
+  placement: 'editor' | 'view';
   descriptor: WebviewDescriptor;
   html?: string;
   tokens?: IncludeTokens<SerializedState>;
 }
 
-export interface WebviewTokens<SerializedState>
-  extends IncludeTokens<SerializedState> {
+export interface WebviewTokens<SerializedState> extends IncludeTokens<SerializedState> {
   webviewId: string;
   webviewInstanceId: string | undefined;
   cspSource: string;
@@ -76,68 +64,58 @@ export interface WebviewTokens<SerializedState>
   root: string;
   webviewsRoot: string;
   webviewRoot: string;
-  placement: "editor" | "view";
+  placement: 'editor' | 'view';
 }
 
 export function getWebviewContent<SerializedState>(
   webview: Webview,
   extensionUri: Uri,
-  config: RenderConfig<SerializedState>
+  config: RenderConfig<SerializedState>,
 ): string {
   const rootUri = webview.asWebviewUri(extensionUri);
-  const webviewsRootPathUri = Uri.joinPath(extensionUri, "dist", "webviews");
+  const webviewsRootPathUri = Uri.joinPath(extensionUri, 'dist', 'webviews');
   const webviewsRootUri = webview.asWebviewUri(webviewsRootPathUri);
-  const webviewRootPathUri = Uri.joinPath(
-    extensionUri,
-    "dist",
-    "webviews",
-    config.descriptor.folderName
-  );
+  const webviewRootPathUri = Uri.joinPath(extensionUri, 'dist', 'webviews', config.descriptor.folderName);
   const webviewRootUri = webview.asWebviewUri(webviewRootPathUri);
   const cspSource = webview.cspSource;
   const cspNonce = getNonce();
 
   return getHtml(config.html, {
     webviewId: config.webviewId,
-    webviewInstanceId: config?.webviewInstanceId,
+    webviewInstanceId: config.webviewInstanceId,
     cspSource,
     cspNonce,
     root: rootUri.toString(),
     webviewsRoot: webviewsRootUri.toString(),
     webviewRoot: webviewRootUri.toString(),
     placement: config.placement,
-    ...config?.tokens,
+    ...config.tokens,
   } satisfies WebviewTokens<SerializedState>);
 }
 
-export function getHtml<SerializedState>(
-  html?: string | undefined,
-  tokens?: WebviewTokens<SerializedState>
-): string {
+export function getHtml<SerializedState>(html?: string, tokens?: WebviewTokens<SerializedState>): string {
   function replaceTokens(html: string) {
     if (!tokens) {
       return html;
     }
 
-    type ReplacementToken = keyof typeof tokens | "roots";
+    type ReplacementToken = keyof typeof tokens | 'roots';
     return html.replace(
       /#{(head|body|endOfBody|webviewId|webviewInstanceId|placement|cspSource|cspNonce|roots|root|webviewsRoot|webviewRoot|bootstrap)}/g,
       (_substring: string, token: ReplacementToken) => {
         switch (token) {
-          case "bootstrap":
-            return tokens.bootstrap !== undefined
-              ? JSON.stringify(tokens.bootstrap).replace(/"/g, "&quot;")
-              : "";
-          case "roots":
+          case 'bootstrap':
+            return tokens.bootstrap !== undefined ? JSON.stringify(tokens.bootstrap).replace(/"/g, '&quot;') : '';
+          case 'roots':
             return JSON.stringify({
               root: tokens.root,
               webviewsRoot: tokens.webviewsRoot,
               webviewRoot: tokens.webviewRoot,
-            }).replace(/"/g, "&quot;");
+            }).replace(/"/g, '&quot;');
           default:
-            return tokens[token] ?? "";
+            return tokens[token] ?? '';
         }
-      }
+      },
     );
   }
 

@@ -1,3 +1,3 @@
-class TodosWebview {
-  constructor() {}
+export class TodosWebview {
+  register() {}
 }
