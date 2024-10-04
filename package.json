@@ -10,12 +10,17 @@
   },
   "license": "SEE LICENSE IN LICENSE",
   "engines": {
-    "vscode": "^1.93.0"
+    "node": ">20.0.0",
+    "vscode": "^1.93.0",
+    "yarn": "^1.22.21"
   },
   "categories": [
     "Other"
   ],
   "activationEvents": [],
+  "capabilities": {
+    "virtualWorkspaces": false
+  },
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [

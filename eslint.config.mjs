@@ -43,8 +43,15 @@ export default tseslint.config(
         'error',
         { ignoreArrowShorthand: true, ignoreVoidOperator: true },
       ],
-      '@typescript-eslint/no-unnecessary-type-parameters': 'off',
+      '@typescript-eslint/unbound-method': 'off',
       '@typescript-eslint/unified-signatures': ['error', { ignoreDifferentlyNamedParameters: true }],
+      '@typescript-eslint/no-unnecessary-type-parameters': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/restrict-template-expressions': [
+        'error',
+        { allowBoolean: true, allowNumber: true, allowNullish: true },
+      ],
       'no-throw-literal': 'warn',
     },
     settings: {

@@ -1,3 +1,5 @@
+import type { EventEmitter as VSCodeEventEmitter } from 'vscode';
+
 import type { Disposable } from './disposable';
 import { NO_OP_DISPOSABLE, toDisposable } from './disposable';
 
@@ -6,7 +8,9 @@ import { NO_OP_DISPOSABLE, toDisposable } from './disposable';
  *
  * @template T The type of event data.
  */
-export class Emitter<T> implements Disposable {
+export class EventEmitter<T> implements VSCodeEventEmitter<T> {
+  static readonly eventName = 'emitterChange';
+
   private _eventTarget?: EventTarget;
   private _disposed = false;
   private _listeners?: Set<Disposable>;
@@ -20,7 +24,7 @@ export class Emitter<T> implements Disposable {
    * @returns A disposable object that can be used to remove the listener.
    */
   event(listener: (e: T) => unknown, thisArgs?: unknown, disposables?: Disposable[]): Disposable {
-    if (this._disposed) return NO_OP_DISPOSABLE;
+    if (this._disposed) return NO_OP_DISPOSABLE as Disposable;
 
     this._listeners ??= new Set();
     this._eventTarget ??= new EventTarget();
@@ -34,10 +38,10 @@ export class Emitter<T> implements Disposable {
       }
     };
 
-    this._eventTarget.addEventListener('change', handler);
+    this._eventTarget.addEventListener(EventEmitter.eventName, handler);
 
     const dispose = toDisposable(() => {
-      this._eventTarget?.removeEventListener('change', handler);
+      this._eventTarget?.removeEventListener(EventEmitter.eventName, handler);
       this._listeners?.delete(dispose);
     });
 

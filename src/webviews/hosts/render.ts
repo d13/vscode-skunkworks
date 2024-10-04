@@ -1,44 +1,8 @@
 import { getNonce } from '@env/crypto';
-import type { Webview, WebviewOptions, ExtensionContext, Disposable } from 'vscode';
-import { Uri, commands, window } from 'vscode';
+import type { Webview } from 'vscode';
+import { Uri } from 'vscode';
 
-export function registerWebviewPanel(
-  command: string,
-  descriptor: WebviewDescriptor,
-  context: ExtensionContext,
-): Disposable {
-  function createWebview() {
-    const panel = window.createWebviewPanel(
-      descriptor.id,
-      descriptor.title,
-      {
-        viewColumn: window.activeTextEditor?.viewColumn ?? 1,
-      },
-      {
-        enableScripts: true,
-        ...descriptor.webviewOptions,
-      },
-    );
-
-    panel.webview.html = getWebviewContent(panel.webview, context.extensionUri, {
-      webviewId: descriptor.id,
-      webviewInstanceId: undefined,
-      placement: 'editor',
-      descriptor,
-    });
-  }
-
-  return commands.registerCommand(command, () => createWebview());
-}
-
-export function registerWebviewView() {}
-
-export interface WebviewDescriptor {
-  id: string;
-  folderName: string;
-  title: string;
-  webviewOptions?: WebviewOptions;
-}
+import type { WebviewDescriptor } from './host';
 
 export interface IncludeTokens<SerializedState> {
   bootstrap?: SerializedState;
