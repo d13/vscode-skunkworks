@@ -1,6 +1,8 @@
+import { provide } from '@lit/context';
 import type { CSSResultGroup } from 'lit';
 import { property } from 'lit/decorators.js';
 
+import { ipcContext, AppIpc } from './app-ipc';
 import { BaseElement } from './components/base-element';
 import { getCodiconsFont } from './styles/codicons.css';
 import type { Disposable } from './utils/disposable';
@@ -8,12 +10,15 @@ import { applyAdoptableStyles } from './utils/stylesheets';
 
 export const DEFAULT_APP_TAG_NAME = 'webview-app';
 
-export abstract class WebviewApp<SerializedState> extends BaseElement {
+export abstract class WebviewApp<SerializedState = unknown> extends BaseElement {
   static override shadowRootOptions: ShadowRootInit = {
     ...BaseElement.shadowRootOptions,
     delegatesFocus: true,
   };
   protected sharedStyles: CSSResultGroup = [];
+
+  @property({ type: String })
+  name!: string;
 
   @property({ type: String })
   placement: 'editor' | 'view' = 'editor';
@@ -28,12 +33,16 @@ export abstract class WebviewApp<SerializedState> extends BaseElement {
   @property({ type: Object })
   bootstrap?: SerializedState;
 
-  protected abstract createStateProviders(bootstrap?: SerializedState): Disposable;
+  @provide({ context: ipcContext })
+  protected _ipc!: AppIpc;
+
+  protected abstract createStateProviders(ipc: AppIpc, bootstrap?: SerializedState): Disposable;
 
   override connectedCallback() {
     super.connectedCallback();
 
-    this.disposables.push(this.createStateProviders(this.bootstrap));
+    this._ipc = new AppIpc(this.name);
+    this.disposables.push(this.createStateProviders(this._ipc, this.bootstrap));
 
     if (document.body.classList.contains('preload')) {
       window.requestAnimationFrame(() => {

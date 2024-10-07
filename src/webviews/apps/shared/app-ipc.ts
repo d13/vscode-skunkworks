@@ -1,3 +1,5 @@
+import { createContext } from '@lit/context';
+
 import type { IpcMessage } from '../../protocol';
 
 import type { VsCodeApi } from './api';
@@ -11,7 +13,7 @@ export class AppIpc implements Disposable {
   private readonly _disposables: Disposable[] = [];
 
   private _onRecieveMessage = new EventEmitter<IpcMessage>();
-  get onRecieveMessage() {
+  get onReceiveMessage() {
     return this._onRecieveMessage.event;
   }
 
@@ -49,3 +51,5 @@ export class AppIpc implements Disposable {
     this._disposables.forEach(disposable => disposable.dispose());
   }
 }
+
+export const ipcContext = createContext<AppIpc>('ipc');

@@ -2,10 +2,11 @@ import type { Webview, WebviewOptions, WebviewPanel, WebviewView } from 'vscode'
 import { Disposable, EventEmitter } from 'vscode';
 
 import type { Container } from '../../container';
+import { asyncReduce } from '../../system/array';
 import type { IpcMessage } from '../protocol';
 
 import { getWebviewContent } from './render';
-import type { WebviewStateProvider } from './state-provider';
+import type { WebviewStateProvider, WebviewStateProviderHooks } from './state-provider';
 
 export interface WebviewDescriptorBase {
   id: string;
@@ -27,14 +28,23 @@ export interface WebviewViewDescriptor extends WebviewDescriptorBase {
 // TODO: remove WebviewDescriptorBase
 export type WebviewDescriptor = WebviewPanelDescriptor | WebviewViewDescriptor | WebviewDescriptorBase;
 
-export class WebviewHost {
-  static async create(
+export class WebviewHost<
+  BootstrapState = Record<string, unknown>,
+  StateProvider extends WebviewStateProvider & WebviewStateProviderHooks = WebviewStateProvider &
+    WebviewStateProviderHooks,
+> implements Disposable
+{
+  static async create<
+    BootstrapState = Record<string, unknown>,
+    StateProvider extends WebviewStateProvider & WebviewStateProviderHooks = WebviewStateProvider &
+      WebviewStateProviderHooks,
+  >(
     container: Container,
     descriptor: WebviewDescriptor,
     parent: WebviewPanel | WebviewView,
-    createStateProviders: (container: Container, host: WebviewHost) => Promise<WebviewStateProvider[]>,
+    createStateProviders: (container: Container, host: WebviewHost) => Promise<StateProvider[]>,
   ): Promise<WebviewHost> {
-    const host = new WebviewHost(container, descriptor, parent, createStateProviders);
+    const host = new WebviewHost<BootstrapState>(container, descriptor, parent, createStateProviders);
     return host.initializing.then(() => host);
   }
 
@@ -42,7 +52,7 @@ export class WebviewHost {
   private readonly webview: Webview;
   private _isInEditor: boolean;
   private readonly _originalTitle: string;
-  private stateProviders!: WebviewStateProvider[];
+  private stateProviders!: StateProvider[];
 
   private readonly _onDidDispose = new EventEmitter<void>();
   get onDidDispose() {
@@ -65,7 +75,7 @@ export class WebviewHost {
     private readonly container: Container,
     private readonly descriptor: WebviewDescriptor,
     public readonly parent: WebviewPanel | WebviewView,
-    createStateProviders: (container: Container, host: WebviewHost) => Promise<WebviewStateProvider[]>,
+    createStateProviders: (container: Container, host: WebviewHost) => Promise<StateProvider[]>,
   ) {
     this.id = descriptor.id;
     this.webview = parent.webview;
@@ -114,17 +124,33 @@ export class WebviewHost {
     );
   }
 
-  private render() {
-    this.webview.html = getWebviewContent(this.webview, this.extensionUri, {
+  private async render() {
+    const bootstrapState = (await asyncReduce(
+      this.stateProviders,
+      async (state, provider) => {
+        if (provider.includeBootstrap) {
+          // FIXME: this is a hack to get the type assertion to work
+          (state as Record<string, unknown>)[provider.namespace] = await provider.includeBootstrap();
+        }
+
+        return state;
+      },
+      {} as BootstrapState,
+    )) as BootstrapState;
+
+    this.webview.html = getWebviewContent<BootstrapState>(this.webview, this.extensionUri, {
       webviewId: this.id,
       webviewInstanceId: undefined,
       placement: this.isView ? 'view' : 'editor',
       descriptor: this.descriptor,
+      tokens: {
+        bootstrap: bootstrapState,
+      },
     });
   }
 
   show() {
-    this.render();
+    void this.render();
 
     if (this.isEditor) {
       (this.parent as WebviewPanel).reveal();

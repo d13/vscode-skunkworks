@@ -1,11 +1,9 @@
-import type { ExtensionContext } from 'vscode';
 import { Disposable, commands, window } from 'vscode';
 
 import type { Container } from '../../container';
 
 import type { WebviewDescriptor } from './host';
 import { WebviewHost } from './host';
-import { getWebviewContent } from './render';
 import type { WebviewStateProvider } from './state-provider';
 
 export class WebviewRegistry implements Disposable {
@@ -13,12 +11,12 @@ export class WebviewRegistry implements Disposable {
 
   constructor(private readonly container: Container) {}
 
-  registerWebviewPanel(
+  registerWebviewPanel<BootstrapState = unknown>(
     command: string,
     descriptor: WebviewDescriptor,
     createStateProviders: (container: Container, host: WebviewHost) => Promise<WebviewStateProvider[]>,
   ): WebviewHost {
-    let host: WebviewHost | undefined;
+    let host: WebviewHost<BootstrapState> | undefined;
     const createWebview = async () => {
       const panel = window.createWebviewPanel(
         descriptor.id,
@@ -32,7 +30,7 @@ export class WebviewRegistry implements Disposable {
         },
       );
 
-      host = await WebviewHost.create(this.container, descriptor, panel, createStateProviders);
+      host = await WebviewHost.create<BootstrapState>(this.container, descriptor, panel, createStateProviders);
 
       // handle deleting the panel
       this._panels.set(
@@ -69,33 +67,4 @@ export class WebviewRegistry implements Disposable {
     this._panels.forEach(panel => void panel.dispose());
     this._panels.clear();
   }
-}
-
-export function registerWebviewPanel(
-  command: string,
-  descriptor: WebviewDescriptor,
-  context: ExtensionContext,
-): Disposable {
-  function createWebview() {
-    const panel = window.createWebviewPanel(
-      descriptor.id,
-      descriptor.title,
-      {
-        viewColumn: window.activeTextEditor?.viewColumn ?? 1,
-      },
-      {
-        enableScripts: true,
-        ...descriptor.webviewOptions,
-      },
-    );
-
-    panel.webview.html = getWebviewContent(panel.webview, context.extensionUri, {
-      webviewId: descriptor.id,
-      webviewInstanceId: undefined,
-      placement: 'editor',
-      descriptor,
-    });
-  }
-
-  return commands.registerCommand(command, () => createWebview());
 }

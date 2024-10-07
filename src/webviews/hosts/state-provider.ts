@@ -5,8 +5,9 @@ import type { IpcMessage } from '../protocol';
 
 import type { WebviewHost } from './host';
 
-export interface WebviewStateProviderHooks<State> extends Disposable {
-  includeBootstrap?(): Partial<State>;
+export interface WebviewStateProviderHooks<State = unknown> extends Disposable {
+  readonly namespace: string;
+  includeBootstrap?(): Promise<Partial<State>>;
 
   // lifecycle hooks
   onShowing?(): void;
@@ -22,8 +23,10 @@ export abstract class WebviewStateProvider<State = unknown> implements WebviewSt
   protected readonly _disposables: Disposable[] = [];
   protected readonly container: Container;
   protected readonly host: WebviewHost;
+  readonly namespace: string;
 
-  constructor(container: Container, host: WebviewHost) {
+  constructor(namespace: string, container: Container, host: WebviewHost) {
+    this.namespace = namespace;
     this.container = container;
     this.host = host;
 

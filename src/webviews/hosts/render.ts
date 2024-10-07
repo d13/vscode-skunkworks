@@ -98,14 +98,14 @@ export function getHtml<SerializedState>(html?: string, tokens?: WebviewTokens<S
                 and only allow scripts that have a specific nonce.
                 (See the 'webview-sample' extension sample for img-src content security policy examples)
             -->
-            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src #{cspSource}; script-src #{cspSource} 'nonce-#{cspNonce}';">
+            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; font-src #{cspSource}; style-src #{cspSource}; script-src #{cspSource} 'nonce-#{cspNonce}';">
 
             <link href="#{webviewsRoot}/webview.css" rel="stylesheet">
 
             <script type="module" nonce="#{cspNonce}" src="#{webviewRoot}.js" defer></script>
         </head>
         <body class="preload">
-            <webview-app roots="#{roots}" placement="#{placement}" state="#{bootstrap}"></webview-app>
+            <webview-app roots="#{roots}" placement="#{placement}" bootstrap="#{bootstrap}"></webview-app>
         </body>
     </html>`);
 }

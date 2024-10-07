@@ -1,7 +1,9 @@
 import type { Event, ExtensionContext, Disposable } from 'vscode';
 import { commands, EventEmitter, window } from 'vscode';
 
+import { TodoService } from './todos/todoService';
 import { WebviewRegistry } from './webviews/hosts/registry';
+import { registerTodosWebviewPanel } from './webviews/hosts/todos/register';
 
 export class Container {
   static #instance: Container | undefined;
@@ -50,9 +52,10 @@ export class Container {
     private readonly _version: string,
   ) {
     //  add controllers, services, webviews, etc
-    const webviews = new WebviewRegistry(this);
+    const webviewRegistry = new WebviewRegistry(this);
     this._disposables = [
-      webviews,
+      (this._todos = new TodoService(this)),
+      webviewRegistry,
       // The command has been defined in the package.json file
       // Now provide the implementation of the command with registerCommand
       // The commandId parameter must match the command field in package.json
@@ -61,15 +64,7 @@ export class Container {
         // Display a message box to the user
         window.showInformationMessage('Hello World from skunkworks!');
       }),
-      webviews.registerWebviewPanel(
-        'skunkworks.todos',
-        {
-          id: 'todos',
-          folderName: 'todos',
-          title: 'Todos',
-        },
-        async () => Promise.resolve([]),
-      ),
+      registerTodosWebviewPanel(webviewRegistry),
     ];
 
     _context.subscriptions.push({
@@ -78,6 +73,11 @@ export class Container {
         this._disposables.reverse().forEach(disposable => void disposable.dispose());
       },
     });
+  }
+
+  private _todos: TodoService;
+  get todos() {
+    return this._todos;
   }
 
   private _onReady: EventEmitter<void> = new EventEmitter<void>();
