@@ -1,9 +1,8 @@
 import type { Container } from '../../../container';
+import { namespace } from '../../providers/todos/protocol';
+import { TodosWebviewProvider } from '../../providers/todos/todos';
 import type { WebviewHost } from '../host';
 import type { WebviewRegistry } from '../registry';
-
-import { namespace } from './protocol';
-import { TodosWebviewProvider } from './todosWebview';
 
 export function registerTodosWebviewPanel(registry: WebviewRegistry) {
   return registry.registerWebviewPanel(

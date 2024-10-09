@@ -3,10 +3,10 @@ import { Disposable, EventEmitter } from 'vscode';
 
 import type { Container } from '../../container';
 import { asyncReduce } from '../../system/array';
-import type { IpcMessage } from '../protocol';
+import type { IpcCall, IpcMessage } from '../providers/protocol';
+import type { WebviewStateProvider, WebviewStateProviderHooks } from '../providers/state-provider';
 
 import { getWebviewContent } from './render';
-import type { WebviewStateProvider, WebviewStateProviderHooks } from './state-provider';
 
 export interface WebviewDescriptorBase {
   id: string;
@@ -115,7 +115,14 @@ export class WebviewHost<
     this._onRecieveMessage.fire(e);
   }
 
-  private notify() {}
+  async send<T extends IpcCall<unknown>, P = unknown>(ipcCall: T, params?: P) {
+    return this.postMessage({
+      id: `${Date.now()}`,
+      scope: ipcCall.scope,
+      method: ipcCall.method,
+      params,
+    });
+  }
 
   private async postMessage(message: IpcMessage): Promise<boolean> {
     return this.webview.postMessage(message).then(

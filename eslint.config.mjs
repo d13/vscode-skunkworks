@@ -45,6 +45,7 @@ export default tseslint.config(
       ],
       '@typescript-eslint/unbound-method': 'off',
       '@typescript-eslint/unified-signatures': ['error', { ignoreDifferentlyNamedParameters: true }],
+      '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }],
       '@typescript-eslint/no-unnecessary-type-parameters': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',

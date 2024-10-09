@@ -1,10 +1,10 @@
 import type { Container } from '../../../container';
-import type { IpcMessage } from '../../protocol';
-import type { WebviewHost } from '../host';
+import type { WebviewHost } from '../../hosts/host';
+import type { IpcMessage } from '../protocol';
 import type { WebviewStateProviderHooks } from '../state-provider';
 import { WebviewStateProvider } from '../state-provider';
 
-import type { TodoState } from './protocol';
+import { AllTodosNotification, type TodoState } from './protocol';
 
 export class TodosWebviewProvider extends WebviewStateProvider implements WebviewStateProviderHooks<TodoState> {
   constructor(namespace: string, container: Container, host: WebviewHost) {
@@ -13,13 +13,25 @@ export class TodosWebviewProvider extends WebviewStateProvider implements Webvie
     console.log('TodosWebview');
   }
 
-  onMessageReceived(e: IpcMessage) {
+  async onMessageReceived(e: IpcMessage): Promise<void> {
     console.log('TodosWebview', e);
+
+    switch (true) {
+      case AllTodosNotification.is(e):
+        void this.host.send(AllTodosNotification, await this.getAll());
+        break;
+      default:
+        break;
+    }
   }
 
   async includeBootstrap() {
     return {
-      todos: await this.container.todos.getAll(),
+      todos: await this.getAll(),
     };
+  }
+
+  getAll() {
+    return this.container.todos.getAll();
   }
 }

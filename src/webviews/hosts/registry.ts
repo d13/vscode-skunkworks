@@ -1,10 +1,10 @@
 import { Disposable, commands, window } from 'vscode';
 
 import type { Container } from '../../container';
+import type { WebviewStateProvider } from '../providers/state-provider';
 
 import type { WebviewDescriptor } from './host';
 import { WebviewHost } from './host';
-import type { WebviewStateProvider } from './state-provider';
 
 export class WebviewRegistry implements Disposable {
   private readonly _panels = new Map<string, Disposable>();

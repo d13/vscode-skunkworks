@@ -1,9 +1,9 @@
 import type { Disposable } from 'vscode';
 
 import type { Container } from '../../container';
-import type { IpcMessage } from '../protocol';
+import type { WebviewHost } from '../hosts/host';
 
-import type { WebviewHost } from './host';
+import type { IpcMessage } from './protocol';
 
 export interface WebviewStateProviderHooks<State = unknown> extends Disposable {
   readonly namespace: string;
