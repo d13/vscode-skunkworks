@@ -1,6 +1,7 @@
 import { ContextProvider } from '@lit/context';
 import type { ReactiveControllerHost } from 'lit';
-import type { IpcMessage } from 'src/webviews/protocol';
+
+import type { IpcMessage } from '../../providers/protocol';
 
 import type { AppIpc } from './app-ipc';
 import type { Disposable } from './utils/disposable';
@@ -9,14 +10,14 @@ type ReactiveElementHost = Partial<ReactiveControllerHost> & HTMLElement;
 
 export abstract class StateProvider<State = unknown> implements Disposable {
   private readonly disposable!: Disposable;
-  private readonly provider: ContextProvider<{ __context__: State }, ReactiveElementHost>;
-  private readonly state?: State;
+  protected readonly provider: ContextProvider<{ __context__: State }, ReactiveElementHost>;
+  protected readonly state: State;
 
   constructor(
     host: ReactiveElementHost,
-    private readonly _ipc: AppIpc,
+    protected readonly _ipc: AppIpc,
     stateContext: { __context__: State },
-    bootstrap?: State,
+    bootstrap: State,
   ) {
     this.state = bootstrap;
     this.provider = new ContextProvider(host, { context: stateContext, initialValue: bootstrap });

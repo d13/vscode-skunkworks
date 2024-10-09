@@ -1,6 +1,6 @@
 import { createContext } from '@lit/context';
 
-import type { IpcMessage } from '../../protocol';
+import type { IpcCall, IpcMessage } from '../../providers/protocol';
 
 import type { VsCodeApi } from './api';
 import { getVsCodeApi } from './api';
@@ -26,11 +26,11 @@ export class AppIpc implements Disposable {
     this._onRecieveMessage.fire(e.data);
   }
 
-  send(type: string, params: unknown) {
+  send(type: IpcCall, params: unknown) {
     this.postMessage({
       id: `${Date.now()}`,
-      scope: type,
-      method: type,
+      scope: type.scope,
+      method: type.method,
       params,
     });
   }

@@ -11,4 +11,6 @@ export interface TodoState {
   todos: Todo[];
 }
 
-export const AllTodosNotification = new IpcCall<TodoState>(namespace, 'get/all');
+export const AllTodosRequest = new IpcCall<undefined>(namespace, 'todos/all');
+
+export const AllTodosResponse = new IpcCall<TodoState>(namespace, 'todos/all/response');

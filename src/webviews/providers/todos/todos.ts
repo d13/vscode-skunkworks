@@ -4,7 +4,7 @@ import type { IpcMessage } from '../protocol';
 import type { WebviewStateProviderHooks } from '../state-provider';
 import { WebviewStateProvider } from '../state-provider';
 
-import { AllTodosNotification, type TodoState } from './protocol';
+import { AllTodosRequest, AllTodosResponse, type TodoState } from './protocol';
 
 export class TodosWebviewProvider extends WebviewStateProvider implements WebviewStateProviderHooks<TodoState> {
   constructor(namespace: string, container: Container, host: WebviewHost) {
@@ -17,8 +17,8 @@ export class TodosWebviewProvider extends WebviewStateProvider implements Webvie
     console.log('TodosWebview', e);
 
     switch (true) {
-      case AllTodosNotification.is(e):
-        void this.host.send(AllTodosNotification, await this.getAll());
+      case AllTodosRequest.is(e):
+        void this.host.send(AllTodosResponse, await this.getAll());
         break;
       default:
         break;

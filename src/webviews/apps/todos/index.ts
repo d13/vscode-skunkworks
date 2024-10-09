@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-import { namespace, type BootstrapState } from '../../hosts/todos/protocol';
+import { namespace, type BootstrapState } from '../../providers/todos/protocol';
 import { DEFAULT_APP_TAG_NAME, WebviewApp } from '../shared/app';
 import type { AppIpc } from '../shared/app-ipc';
 

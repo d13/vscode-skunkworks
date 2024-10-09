@@ -1,7 +1,8 @@
 import { consume } from '@lit/context';
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import type { TodoState } from 'src/webviews/hosts/todos/protocol';
+
+import type { TodoState } from '../../providers/todos/protocol';
 
 import { stateContext } from './state';
 import '../shared/components/todos';
