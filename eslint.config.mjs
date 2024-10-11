@@ -39,6 +39,13 @@ export default tseslint.config(
       'import-x/no-duplicates': 'error',
       // TypeScript rules
       '@typescript-eslint/consistent-type-imports': ['error', { disallowTypeAnnotations: false }],
+      '@typescript-eslint/naming-convention': [
+        'warn',
+        {
+          selector: 'import',
+          format: ['camelCase', 'PascalCase'],
+        },
+      ],
       '@typescript-eslint/no-confusing-void-expression': [
         'error',
         { ignoreArrowShorthand: true, ignoreVoidOperator: true },
