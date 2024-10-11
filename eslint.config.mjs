@@ -3,6 +3,8 @@ import globals from 'globals';
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import importXPlugin from 'eslint-plugin-import-x';
+import { configs as litConfigs } from 'eslint-plugin-lit';
+import { configs as wcConfigs } from 'eslint-plugin-wc';
 
 export default tseslint.config(
   eslint.configs.recommended,
@@ -92,6 +94,8 @@ export default tseslint.config(
   },
   {
     name: 'webviews',
+    ...litConfigs['flat/recommended'],
+    ...wcConfigs['flat/recommended'],
     files: ['src/webviews/apps/**/*', 'src/env/browser/**/*'],
     languageOptions: {
       globals: {
@@ -105,6 +109,14 @@ export default tseslint.config(
           impliedStrict: true,
         },
         projectService: true,
+      },
+    },
+    settings: {
+      wc: {
+        elementBaseClasses: [
+          'LitElement', // Recognize `LitElement` as a Custom Element base class
+          'BaseElement',
+        ],
       },
     },
   },
