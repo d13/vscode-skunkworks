@@ -105,7 +105,7 @@ export function getHtml<SerializedState>(html?: string, tokens?: WebviewTokens<S
             <script type="module" nonce="#{cspNonce}" src="#{webviewRoot}.js" defer></script>
         </head>
         <body class="preload">
-            <webview-app roots="#{roots}" placement="#{placement}" bootstrap="#{bootstrap}"></webview-app>
+            <webview-app roots="#{roots}" webview-placement="#{placement}" bootstrap="#{bootstrap}"></webview-app>
         </body>
     </html>`);
 }

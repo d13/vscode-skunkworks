@@ -20,7 +20,7 @@ export abstract class WebviewApp<SerializedState = unknown> extends BaseElement 
   @property({ type: String })
   name!: string;
 
-  @property({ type: String })
+  @property({ type: String, attribute: 'webview-placement' })
   placement: 'editor' | 'view' = 'editor';
 
   @property({ type: Object })

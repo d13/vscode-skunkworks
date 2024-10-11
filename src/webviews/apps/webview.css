@@ -1,3 +1,24 @@
+/* spacing tokens - using logical property style naming */
+:root {}
+
+:root:has(.vscode-dark, .vscode-high-contrast) {
+  color-scheme: dark;
+}
+
+:root:has(.vscode-light, .vscode-high-contrast-light) {
+  color-scheme: light;
+}
+
+:root:has([webview-placement='view']) {
+  --vscode-background: var(--vscode-sideBar-background, transparent);
+  --vscode-foreground:var(--vscode-sideBar-foreground, var(--vscode-foreground));
+}
+
+:root:has([webview-placement='editor']) {
+  --vscode-background: var(--vscode-editor-background, transparent);
+  --vscode-foreground: var(--vscode-editor-foreground, --vscode-foreground);
+}
+
 /* This @supports selector is a temporary fix for https://github.com/microsoft/vscode/issues/213045#issuecomment-2211442905 */
 @supports selector(::-webkit-scrollbar) {
   html {
@@ -38,4 +59,9 @@ html {
 
 body:not(.preload) {
   transition: opacity 0.1s ease-in;
+}
+
+body {
+  background: var(--vscode-editor-background, transparent);
+  color: var(--vscode-editor-foreground, --vscode-foreground);
 }
